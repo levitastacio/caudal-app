@@ -406,6 +406,17 @@ body::before {
   </div>
 </div>
 
+<div class="modal-backdrop" id="modal-breakdown">
+  <div class="modal">
+    <h2 id="breakdown-title">Desglose</h2>
+    <p class="modal-sub" id="breakdown-subtitle"></p>
+    <div id="breakdown-list" style="max-height: 400px; overflow-y: auto;"></div>
+    <div class="modal-actions" style="margin-top: 24px;">
+      <button class="btn ghost" onclick="closeModal('modal-breakdown')">Cerrar</button>
+    </div>
+  </div>
+</div>
+
 <script>
 /* ============== CONFIG ============== */
 const CATEGORIES = {
@@ -815,7 +826,7 @@ function renderCategoryList() {
     const cat = findCat(cid);
     const pct = total ? (amt/total*100) : 0;
     return `
-      <div class="cat-item">
+      <div class="cat-item" onclick="showCategoryBreakdown('${cid}')" style="cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='var(--bg-2)'" onmouseout="this.style.background='transparent'">
         <span class="cat-emoji">${cat.emoji}</span>
         <span class="cat-name">${cat.name}</span>
         <div class="cat-bar"><div class="cat-bar-fill" style="width:${pct}%;background:${cat.color};"></div></div>
@@ -972,6 +983,38 @@ function renderSparks() {
   };
   drawSpark('spark-in', 'income', '#7ed957');
   drawSpark('spark-out', 'expense', '#ff6b5b');
+}
+
+/* ============== BREAKDOWN DETAIL ============== */
+function showCategoryBreakdown(catId) {
+  const all = getAllTransactions();
+  const monthStart = new Date(); monthStart.setDate(1); monthStart.setHours(0,0,0,0);
+  const categoryTx = all.filter(t => t.type==='expense' && t.category === catId && new Date(t.date) >= monthStart);
+  const total = categoryTx.reduce((s,t)=>s+t.amount, 0);
+  const cat = findCat(catId);
+
+  document.getElementById('breakdown-title').textContent = `${cat.emoji} ${cat.name}`;
+  document.getElementById('breakdown-subtitle').textContent = `${categoryTx.length} transacciones • Total: ${fmt(total)}`;
+
+  const html = categoryTx.sort((a,b) => new Date(b.date) - new Date(a.date)).map(t => {
+    const date = new Date(t.date).toLocaleDateString('es-DO', {day:'numeric', month:'short', year:'numeric'});
+    const time = new Date(t.date).toLocaleTimeString('es-DO', {hour:'2-digit', minute:'2-digit'});
+    return `
+      <div style="padding: 14px 0; border-bottom: 1px solid var(--line); display: grid; grid-template-columns: 1fr auto;">
+        <div>
+          <div style="font-size: 14px; font-weight: 500; margin-bottom: 2px;">${escapeHTML(t.description)}</div>
+          <div style="font-size: 12px; color: var(--ink-mute);">${date} · ${time}</div>
+          <div style="font-size: 11px; color: var(--ink-mute); margin-top: 4px;">${t.bank ? '🏦 ' + t.bank : '📧 Gmail'}</div>
+        </div>
+        <div style="text-align: right; font-family: 'JetBrains Mono'; font-weight: 500; padding-left: 16px;">
+          - ${fmt(t.amount)}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  document.getElementById('breakdown-list').innerHTML = html || '<div class="empty"><div class="sm">Sin transacciones</div></div>';
+  openModal('modal-breakdown');
 }
 
 /* ============== MODAL HELPERS ============== */
