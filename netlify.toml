@@ -1,0 +1,29 @@
+# Netlify Configuration for Caudal Finance App
+
+[build]
+  # No build step needed - this is a static HTML app
+  publish = "."
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[context.production]
+  environment = { NODE_ENV = "production" }
+
+# Cache control headers
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "max-age=0, no-cache, no-store, must-revalidate"
+
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "max-age=31536000, immutable"
