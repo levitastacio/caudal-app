@@ -210,6 +210,11 @@ body::before {
       <div class="tag">Tus finanzas, claras</div>
     </div>
     <div class="header-actions">
+      <div style="display: flex; gap: 8px; align-items: center; border: 1px solid var(--line-2); border-radius: 999px; padding: 6px 8px;">
+        <button class="btn ghost" id="currency-usd" onclick="setCurrency('USD')" style="padding: 4px 10px; font-size: 12px;">USD</button>
+        <span style="width: 1px; height: 16px; background: var(--line-2);"></span>
+        <button class="btn ghost active" id="currency-rdp" onclick="setCurrency('RDP')" style="padding: 4px 10px; font-size: 12px;">RD$</button>
+      </div>
       <div class="connect-state" id="connect-state" onclick="openSheetModal()">
         <span class="connect-dot" id="connect-dot"></span>
         <span id="connect-text">Sin conectar</span>
@@ -460,13 +465,45 @@ function escapeHTML(s) {
 const STORAGE_KEY = 'caudal-tx-v3';
 const SHEET_URL_KEY = 'caudal-sheet-url';
 const LAST_SYNC_KEY = 'caudal-last-sync';
+const CURRENCY_KEY = 'caudal-currency';
 
 let transactions = [];
-let manualTransactions = []; // transacciones agregadas a mano (no vienen del Sheet)
+let manualTransactions = [];
 let currentRange = 7;
 let currentFilter = 'all';
 let modalType = 'expense';
 let sheetUrl = null;
+let currentCurrency = 'RDP'; // RDP = RD$, USD = USD
+const USD_TO_RDP = 60;
+
+function getCurrencySymbol() {
+  return currentCurrency === 'USD' ? 'US$' : 'RD$';
+}
+
+function convertToDisplay(amount, originalCurrency) {
+  if (!originalCurrency) originalCurrency = 'RD$';
+
+  // Si está en USD y queremos mostrar en RD$, multiplica por 60
+  if (originalCurrency === 'USD' && currentCurrency === 'RDP') {
+    return amount * USD_TO_RDP;
+  }
+  // Si está en RD$ y queremos mostrar en USD, divide por 60
+  if (originalCurrency === 'RD$' && currentCurrency === 'USD') {
+    return amount / USD_TO_RDP;
+  }
+  // Si son la misma moneda, devuelve igual
+  return amount;
+}
+
+function setCurrency(c) {
+  currentCurrency = c;
+  localStorage.setItem(CURRENCY_KEY, c);
+  document.getElementById('currency-usd').classList.toggle('active', c === 'USD');
+  document.getElementById('currency-rdp').classList.toggle('active', c === 'RDP');
+  renderDashboard();
+}
+
+const fmt = (n) => getCurrencySymbol() + ' ' + Math.round(n).toLocaleString('es-DO');
 
 function loadState() {
   try {
@@ -474,7 +511,17 @@ function loadState() {
     if (raw) manualTransactions = JSON.parse(raw);
   } catch(e) {}
   sheetUrl = localStorage.getItem(SHEET_URL_KEY);
+  const saved = localStorage.getItem(CURRENCY_KEY);
+  if (saved) {
+    currentCurrency = saved;
+  }
   updateConnectState();
+  updateCurrencyButtons();
+}
+
+function updateCurrencyButtons() {
+  document.getElementById('currency-usd').classList.toggle('active', currentCurrency === 'USD');
+  document.getElementById('currency-rdp').classList.toggle('active', currentCurrency === 'RDP');
 }
 function saveManual() {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(manualTransactions)); } catch(e){}
@@ -605,7 +652,7 @@ function parseCSV(csv) {
 
   if (lines.length < 2) return [];
 
-  // Encabezado esperado: fecha, tipo, monto, descripcion, categoria, banco, fecha_correo, asunto, origen
+  // Encabezado esperado: fecha, tipo, monto, descripcion, categoria, banco, fecha_correo, asunto, origen, moneda
   const header = lines[0].map(h => h.toLowerCase().trim());
   const idx = {
     fecha: header.indexOf('fecha'),
@@ -613,7 +660,8 @@ function parseCSV(csv) {
     monto: header.indexOf('monto'),
     descripcion: header.indexOf('descripcion'),
     categoria: header.indexOf('categoria'),
-    banco: header.indexOf('banco')
+    banco: header.indexOf('banco'),
+    moneda: header.indexOf('moneda')
   };
 
   const result = [];
@@ -636,6 +684,7 @@ function parseCSV(csv) {
       dateNorm = `${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`;
     }
 
+    const moneda = idx.moneda >= 0 ? (row[idx.moneda] || 'RD$').trim() : 'RD$';
     result.push({
       id: 'gm-' + i + '-' + monto + '-' + desc.slice(0,20),
       type: tipo === 'income' ? 'income' : 'expense',
@@ -645,6 +694,7 @@ function parseCSV(csv) {
       date: dateNorm,
       source: 'gmail',
       bank: banco,
+      moneda: moneda,
       createdAt: new Date(dateNorm).getTime() || Date.now()
     });
   }
@@ -682,30 +732,31 @@ function renderSummary() {
   const all = getAllTransactions();
   const monthStart = new Date(); monthStart.setDate(1); monthStart.setHours(0,0,0,0);
   const monthTx = all.filter(t => new Date(t.date) >= monthStart);
-  const inc = monthTx.filter(t => t.type === 'income').reduce((s,t) => s + t.amount, 0);
-  const out = monthTx.filter(t => t.type === 'expense').reduce((s,t) => s + t.amount, 0);
+  const inc = monthTx.filter(t => t.type === 'income').reduce((s,t) => s + convertToDisplay(t.amount, t.moneda), 0);
+  const out = monthTx.filter(t => t.type === 'expense').reduce((s,t) => s + convertToDisplay(t.amount, t.moneda), 0);
   const balance = inc - out;
 
   const intPart = Math.floor(Math.abs(balance)).toLocaleString('es-DO');
   const decPart = '.' + (Math.abs(balance) % 1).toFixed(2).slice(2);
   document.getElementById('balance-int').textContent = (balance < 0 ? '-' : '') + intPart;
   document.getElementById('balance-dec').textContent = decPart;
+  document.querySelector('.balance-amount .currency').textContent = getCurrencySymbol();
   document.getElementById('total-in').textContent = fmt(inc);
   document.getElementById('total-out').textContent = fmt(out);
   document.getElementById('tx-count').textContent = monthTx.length;
 
-  const topInc = [...monthTx].filter(t => t.type==='income').sort((a,b)=>b.amount-a.amount)[0];
+  const topInc = [...monthTx].filter(t => t.type==='income').sort((a,b)=>convertToDisplay(b.amount, b.moneda)-convertToDisplay(a.amount, a.moneda))[0];
   if (topInc) {
-    document.getElementById('top-income-amt').textContent = fmt(topInc.amount);
+    document.getElementById('top-income-amt').textContent = fmt(convertToDisplay(topInc.amount, topInc.moneda));
     document.getElementById('top-income-src').textContent = topInc.description;
   } else {
-    document.getElementById('top-income-amt').textContent = 'RD$ 0';
+    document.getElementById('top-income-amt').textContent = fmt(0);
     document.getElementById('top-income-src').textContent = 'Sin ingresos';
   }
 
   const catTotals = {};
   monthTx.filter(t => t.type==='expense').forEach(t => {
-    catTotals[t.category] = (catTotals[t.category] || 0) + t.amount;
+    catTotals[t.category] = (catTotals[t.category] || 0) + convertToDisplay(t.amount, t.moneda);
   });
   const sorted = Object.entries(catTotals).sort((a,b)=>b[1]-a[1]);
   if (sorted.length) {
@@ -713,7 +764,7 @@ function renderSummary() {
     document.getElementById('top-cat-amt').textContent = fmt(sorted[0][1]);
     document.getElementById('top-cat-name').textContent = cat.emoji + ' ' + cat.name;
   } else {
-    document.getElementById('top-cat-amt').textContent = 'RD$ 0';
+    document.getElementById('top-cat-amt').textContent = fmt(0);
     document.getElementById('top-cat-name').textContent = 'Sin gastos';
   }
 }
@@ -730,8 +781,8 @@ function renderFlowChart() {
     const iso = d.toISOString().slice(0,10);
     labels.push(d.toLocaleDateString('es-DO', { day: 'numeric', month: 'short' }));
     const dayTx = all.filter(t => t.date === iso);
-    incomeData.push(dayTx.filter(t => t.type==='income').reduce((s,t)=>s+t.amount,0));
-    expenseData.push(dayTx.filter(t => t.type==='expense').reduce((s,t)=>s+t.amount,0));
+    incomeData.push(dayTx.filter(t => t.type==='income').reduce((s,t)=>s+convertToDisplay(t.amount, t.moneda),0));
+    expenseData.push(dayTx.filter(t => t.type==='expense').reduce((s,t)=>s+convertToDisplay(t.amount, t.moneda),0));
   }
 
   const ctx = document.getElementById('flow-chart').getContext('2d');
@@ -773,7 +824,7 @@ function renderDonut() {
   const monthStart = new Date(); monthStart.setDate(1); monthStart.setHours(0,0,0,0);
   const monthTx = all.filter(t => t.type==='expense' && new Date(t.date) >= monthStart);
   const catTotals = {};
-  monthTx.forEach(t => { catTotals[t.category] = (catTotals[t.category] || 0) + t.amount; });
+  monthTx.forEach(t => { catTotals[t.category] = (catTotals[t.category] || 0) + convertToDisplay(t.amount, t.moneda); });
   const sorted = Object.entries(catTotals).sort((a,b) => b[1] - a[1]);
 
   const labels = sorted.map(([c]) => findCat(c).name);
@@ -817,9 +868,9 @@ function renderCategoryList() {
   const list = document.getElementById('cat-list');
   const monthStart = new Date(); monthStart.setDate(1); monthStart.setHours(0,0,0,0);
   const monthTx = all.filter(t => t.type==='expense' && new Date(t.date) >= monthStart);
-  const total = monthTx.reduce((s,t)=>s+t.amount, 0);
+  const total = monthTx.reduce((s,t)=>s+convertToDisplay(t.amount, t.moneda), 0);
   const catTotals = {};
-  monthTx.forEach(t => { catTotals[t.category] = (catTotals[t.category] || 0) + t.amount; });
+  monthTx.forEach(t => { catTotals[t.category] = (catTotals[t.category] || 0) + convertToDisplay(t.amount, t.moneda); });
   const sorted = Object.entries(catTotals).sort((a,b) => b[1] - a[1]).slice(0,6);
 
   list.innerHTML = sorted.map(([cid, amt]) => {
@@ -860,6 +911,7 @@ function renderTransactions() {
     const cat = findCat(t.category);
     const dateStr = new Date(t.date).toLocaleDateString('es-DO', { day: 'numeric', month: 'short' });
     const canDelete = t.source !== 'gmail';
+    const displayAmount = convertToDisplay(t.amount, t.moneda);
     return `
       <div class="tx-item">
         <div class="tx-icon" style="background: ${cat.color}15; border-color: ${cat.color}40;">${cat.emoji}</div>
@@ -872,7 +924,7 @@ function renderTransactions() {
             ${t.source === 'gmail' ? '<span class="tx-source gmail">📧 ' + (t.bank || 'Gmail') + '</span>' : ''}
           </div>
         </div>
-        <div class="tx-amount ${t.type==='income'?'in':'out'}">${t.type==='income'?'+':'−'} ${fmt(t.amount)}</div>
+        <div class="tx-amount ${t.type==='income'?'in':'out'}">${t.type==='income'?'+':'−'} ${fmt(displayAmount)}</div>
         ${canDelete ? `<button class="tx-del" title="Eliminar" onclick="deleteTransaction('${t.id}')">×</button>` : '<span></span>'}
       </div>
     `;
@@ -896,15 +948,15 @@ function renderInsights() {
     return;
   }
 
-  const inc = monthTx.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
-  const out = monthTx.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
+  const inc = monthTx.filter(t=>t.type==='income').reduce((s,t)=>s+convertToDisplay(t.amount, t.moneda),0);
+  const out = monthTx.filter(t=>t.type==='expense').reduce((s,t)=>s+convertToDisplay(t.amount, t.moneda),0);
   const ratio = inc ? (out/inc*100).toFixed(0) : 0;
 
   const catTotals = {};
-  monthTx.filter(t=>t.type==='expense').forEach(t => { catTotals[t.category] = (catTotals[t.category] || 0) + t.amount; });
+  monthTx.filter(t=>t.type==='expense').forEach(t => { catTotals[t.category] = (catTotals[t.category] || 0) + convertToDisplay(t.amount, t.moneda); });
   const top = Object.entries(catTotals).sort((a,b)=>b[1]-a[1])[0];
 
-  const subsTotal = monthTx.filter(t => t.category === 'subscriptions').reduce((s,t)=>s+t.amount,0);
+  const subsTotal = monthTx.filter(t => t.category === 'subscriptions').reduce((s,t)=>s+convertToDisplay(t.amount, t.moneda),0);
   const daysElapsed = Math.max(1, new Date().getDate());
   const dailyAvg = out / daysElapsed;
 
@@ -940,7 +992,7 @@ function renderHeatmap() {
     const d = new Date(now);
     d.setDate(d.getDate() - (29 - i));
     const iso = d.toISOString().slice(0,10);
-    const total = all.filter(t => t.date === iso && t.type==='expense').reduce((s,t)=>s+t.amount,0);
+    const total = all.filter(t => t.date === iso && t.type==='expense').reduce((s,t)=>s+convertToDisplay(t.amount, t.moneda),0);
     byDay[iso] = total;
     if (total > maxDay) maxDay = total;
   }
@@ -973,7 +1025,7 @@ function renderSparks() {
       const d = new Date(now);
       d.setDate(d.getDate() - i);
       const iso = d.toISOString().slice(0,10);
-      data.push(all.filter(t => t.date === iso && t.type === type).reduce((s,t)=>s+t.amount,0));
+      data.push(all.filter(t => t.date === iso && t.type === type).reduce((s,t)=>s+convertToDisplay(t.amount, t.moneda),0));
     }
     new Chart(ctx, {
       type: 'line',
@@ -990,7 +1042,7 @@ function showCategoryBreakdown(catId) {
   const all = getAllTransactions();
   const monthStart = new Date(); monthStart.setDate(1); monthStart.setHours(0,0,0,0);
   const categoryTx = all.filter(t => t.type==='expense' && t.category === catId && new Date(t.date) >= monthStart);
-  const total = categoryTx.reduce((s,t)=>s+t.amount, 0);
+  const total = categoryTx.reduce((s,t)=>s+convertToDisplay(t.amount, t.moneda), 0);
   const cat = findCat(catId);
 
   document.getElementById('breakdown-title').textContent = `${cat.emoji} ${cat.name}`;
@@ -999,6 +1051,7 @@ function showCategoryBreakdown(catId) {
   const html = categoryTx.sort((a,b) => new Date(b.date) - new Date(a.date)).map(t => {
     const date = new Date(t.date).toLocaleDateString('es-DO', {day:'numeric', month:'short', year:'numeric'});
     const time = new Date(t.date).toLocaleTimeString('es-DO', {hour:'2-digit', minute:'2-digit'});
+    const displayAmount = convertToDisplay(t.amount, t.moneda);
     return `
       <div style="padding: 14px 0; border-bottom: 1px solid var(--line); display: grid; grid-template-columns: 1fr auto;">
         <div>
@@ -1007,7 +1060,7 @@ function showCategoryBreakdown(catId) {
           <div style="font-size: 11px; color: var(--ink-mute); margin-top: 4px;">${t.bank ? '🏦 ' + t.bank : '📧 Gmail'}</div>
         </div>
         <div style="text-align: right; font-family: 'JetBrains Mono'; font-weight: 500; padding-left: 16px;">
-          - ${fmt(t.amount)}
+          - ${fmt(displayAmount)}
         </div>
       </div>
     `;
