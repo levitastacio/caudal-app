@@ -500,7 +500,7 @@ function setCurrency(c) {
   localStorage.setItem(CURRENCY_KEY, c);
   document.getElementById('currency-usd').classList.toggle('active', c === 'USD');
   document.getElementById('currency-rdp').classList.toggle('active', c === 'RDP');
-  renderDashboard();
+  render();
 }
 
 const fmt = (n) => getCurrencySymbol() + ' ' + Math.round(n).toLocaleString('es-DO');
