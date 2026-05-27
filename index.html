@@ -59,11 +59,12 @@ body::before {
 }
 
 .serif { font-family: 'Fraunces', serif; font-optical-sizing: auto; letter-spacing: -0.02em; }
-.mono  { font-family: 'JetBrains Mono', monospace; }
+.mono { font-family: 'JetBrains Mono', monospace; }
 
 .app { position: relative; z-index: 1; max-width: 1400px; margin: 0 auto; padding: 28px 32px 110px; }
 @media (max-width: 720px) { .app { padding: 18px 16px 110px; } }
 
+/* HEADER */
 .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; gap: 20px; flex-wrap: wrap; }
 .brand { display: flex; align-items: baseline; gap: 12px; }
 .brand .logo {
@@ -84,6 +85,7 @@ body::before {
 }
 .header-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 
+/* BUTTONS */
 .btn {
   font-family: inherit; font-size: 13px; font-weight: 500;
   padding: 10px 16px; border-radius: 999px;
@@ -99,9 +101,11 @@ body::before {
 .btn.danger { color: var(--red); }
 .btn.danger:hover { background: rgba(255,107,91,0.1); border-color: var(--red); }
 
+/* HERO */
 .hero { display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px; margin-bottom: 16px; }
 @media (max-width: 900px) { .hero { grid-template-columns: 1fr; } }
 
+/* BALANCE CARD — LA JOYA */
 .balance-card {
   background: linear-gradient(135deg, var(--surface) 0%, var(--bg-2) 100%);
   border: 1px solid var(--line);
@@ -142,6 +146,7 @@ body::before {
 .meta-value.up { color: var(--green); }
 .meta-value.down { color: var(--red); }
 
+/* MINI CARDS LATERALES con sparklines */
 .mini-cards { display: grid; grid-template-rows: 1fr 1fr; gap: 16px; }
 .mini-card {
   background: var(--surface);
@@ -161,6 +166,7 @@ body::before {
 .mini-card.out .value { color: var(--red); }
 .mini-spark { width: 90px; height: 40px; }
 
+/* GRID */
 .grid { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-top: 16px; }
 @media (max-width: 1000px) { .grid { grid-template-columns: 1fr; } }
 
@@ -169,15 +175,18 @@ body::before {
 .card-title { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 500; letter-spacing: -0.02em; }
 .card-subtitle { font-size: 12px; color: var(--ink-mute); margin-top: 2px; }
 
+/* TABS */
 .tabs { display: inline-flex; background: var(--bg-2); border-radius: 999px; padding: 4px; border: 1px solid var(--line); }
 .tab { padding: 7px 14px; font-size: 12px; font-weight: 500; border-radius: 999px; cursor: pointer; color: var(--ink-dim); transition: all 0.2s; border: none; background: transparent; font-family: inherit; }
 .tab.active { background: var(--ink); color: var(--bg); }
 .tab:hover:not(.active) { color: var(--ink); }
 
+/* CHARTS */
 .chart-wrap { position: relative; height: 320px; }
 .chart-wrap.small { height: 240px; }
 .chart-wrap.tall { height: 380px; }
 
+/* CATEGORÍAS LIST */
 .cat-list { display: flex; flex-direction: column; gap: 14px; }
 .cat-item { display: flex; align-items: center; gap: 14px; }
 .cat-name { flex: 1; font-size: 14px; font-weight: 500; }
@@ -187,9 +196,9 @@ body::before {
 .cat-amount { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 500; text-align: right; min-width: 90px; }
 .cat-pct { font-size: 11px; color: var(--ink-mute); min-width: 40px; text-align: right; }
 
+/* TRANSACCIONES */
 .tx-list { display: flex; flex-direction: column; }
-.tx-item { display: grid; grid-template-columns: 40px 1fr auto auto; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--line); align-items: center; cursor: pointer; }
-.tx-item:hover { background: rgba(212, 255, 58, 0.02); padding: 14px 8px; border-radius: 8px; margin: 0 -8px; padding-left: 8px; }
+.tx-item { display: grid; grid-template-columns: 40px 1fr auto auto; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--line); align-items: center; }
 .tx-item:last-child { border-bottom: none; }
 .tx-icon { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; background: var(--bg-2); border: 1px solid var(--line); }
 .tx-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
@@ -199,6 +208,7 @@ body::before {
 .tx-amount.in { color: var(--green); }
 .tx-amount.out { color: var(--ink); }
 
+/* INSIGHTS — fondo lima TENUE, no sólido */
 .insight-card {
   background: linear-gradient(135deg, rgba(212, 255, 58, 0.08), rgba(212, 255, 58, 0.02));
   border: 1px solid rgba(212, 255, 58, 0.2);
@@ -211,10 +221,12 @@ body::before {
 .insight-text { font-size: 13px; line-height: 1.5; color: var(--ink); }
 .insight-text strong { color: var(--accent); }
 
+/* HEATMAP */
 .heatmap { display: grid; grid-template-columns: repeat(30, 1fr); gap: 3px; margin-top: 16px; }
-.heat-cell { aspect-ratio: 1; border-radius: 3px; background: var(--bg-2); transition: transform 0.2s; cursor: pointer; }
+.heat-cell { aspect-ratio: 1; border-radius: 3px; background: var(--bg-2); transition: transform 0.2s; }
 .heat-cell:hover { transform: scale(1.5); z-index: 2; position: relative; }
 
+/* MODAL */
 .modal-backdrop { position: fixed; inset: 0; background: rgba(10, 13, 12, 0.75); backdrop-filter: blur(12px); z-index: 100; display: none; align-items: center; justify-content: center; padding: 20px; }
 .modal-backdrop.show { display: flex; }
 .modal { background: var(--surface); border: 1px solid var(--line-2); border-radius: 24px; padding: 32px; max-width: 560px; width: 100%; max-height: 90vh; overflow-y: auto; }
@@ -226,11 +238,13 @@ body::before {
 .field input, .field select, .field textarea { width: 100%; background: var(--bg-2); border: 1px solid var(--line); color: var(--ink); padding: 12px 14px; border-radius: 12px; font-family: inherit; font-size: 14px; outline: none; transition: border-color 0.2s; }
 .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--accent); }
 
+/* SCROLLBAR */
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--line-2); border-radius: 99px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--ink-mute); }
 
+/* BOTTOM NAV */
 .bottom-nav {
   position: fixed; bottom: 0; left: 0; right: 0;
   background: rgba(22, 26, 20, 0.92);
@@ -250,6 +264,7 @@ body::before {
 .nav-item .nav-icon { font-size: 22px; }
 .nav-item.fab { background: var(--accent); color: #0a0d0c; width: 52px; height: 52px; border-radius: 50%; flex: 0 0 52px; font-size: 26px; font-weight: 300; box-shadow: 0 12px 32px -8px rgba(212, 255, 58, 0.5); }
 
+/* WALLET CARDS estilo Apple Wallet — GRADIENTES POR BANCO */
 .wallet-card {
   aspect-ratio: 1.586;
   border-radius: 22px;
@@ -273,9 +288,8 @@ body::before {
 .wallet-card .card-type { font-size: 11px; opacity: 0.75; text-transform: uppercase; letter-spacing: 0.15em; }
 .wallet-card .card-number { font-family: 'JetBrains Mono', monospace; font-size: 18px; letter-spacing: 0.15em; opacity: 0.9; }
 .wallet-card .card-balance { font-family: 'Fraunces', serif; font-size: 28px; font-weight: 500; }
-.wallet-card .util-bar { height: 4px; background: rgba(255,255,255,0.2); border-radius: 99px; overflow: hidden; margin-top: 8px; }
-.wallet-card .util-bar-fill { height: 100%; background: white; border-radius: 99px; }
 
+/* Gradientes específicos por banco */
 .wallet-card.bank-banreservas-gold { background: linear-gradient(135deg, #d4af37, #b8860b 50%, #8b6914); }
 .wallet-card.bank-banreservas { background: linear-gradient(135deg, #003876, #001f4d); }
 .wallet-card.bank-popular { background: linear-gradient(135deg, #e63946, #9d1c2a); }
@@ -287,6 +301,7 @@ body::before {
 .wallet-card.bank-cash { background: linear-gradient(135deg, #2d2d2d, #1a1a1a); }
 .wallet-card.bank-generic { background: linear-gradient(135deg, #4a4a3a, #1d2218); }
 
+/* GOAL CARDS */
 .goal-card {
   background: var(--surface);
   border: 1px solid var(--line);
@@ -306,6 +321,201 @@ body::before {
 .view { display: none; }
 .view.active { display: block; }
 
+/* SIDEBAR (desktop only) */
+.sidebar {
+  display: none;
+  position: fixed;
+  left: 0; top: 0; bottom: 0;
+  width: 220px;
+  background: var(--surface);
+  border-right: 1px solid var(--line);
+  padding: 24px 16px;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 40;
+}
+.sidebar .sidebar-brand {
+  padding: 8px 12px 24px;
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 28px;
+  letter-spacing: -0.04em;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 16px;
+}
+.sidebar .sidebar-brand em {
+  font-style: italic;
+  color: var(--accent);
+  font-weight: 500;
+}
+.sidebar .sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  color: var(--ink-dim);
+  font-size: 14px;
+  font-weight: 500;
+  font-family: inherit;
+  background: none;
+  border: none;
+  border-left: 3px solid transparent;
+  transition: all 0.2s;
+  text-align: left;
+  width: 100%;
+}
+.sidebar .sidebar-item:hover {
+  background: var(--surface-2);
+  color: var(--ink);
+}
+.sidebar .sidebar-item.active {
+  background: rgba(212, 255, 58, 0.08);
+  color: var(--accent);
+  border-left-color: var(--accent);
+}
+.sidebar .sidebar-icon {
+  font-size: 20px;
+  width: 24px;
+  text-align: center;
+}
+.sidebar .sidebar-spacer { margin-top: auto; padding-top: 16px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 8px; }
+
+/* En desktop: mostrar sidebar y dar margen al contenido */
+@media (min-width: 1000px) {
+  .sidebar { display: flex; }
+  .app { padding-left: 252px; }
+  .bottom-nav { display: none; }
+}
+
+/* DROP ZONE OVERLAY */
+.drop-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 13, 12, 0.85);
+  backdrop-filter: blur(20px);
+  z-index: 200;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+.drop-overlay.show { display: flex; }
+.drop-overlay-inner {
+  border: 3px dashed var(--accent);
+  border-radius: 32px;
+  padding: 80px 120px;
+  text-align: center;
+  background: rgba(212, 255, 58, 0.05);
+}
+.drop-overlay-inner .drop-icon {
+  font-size: 80px;
+  margin-bottom: 24px;
+  display: block;
+}
+.drop-overlay-inner .drop-text {
+  font-family: 'Fraunces', serif;
+  font-size: 32px;
+  color: var(--accent);
+  letter-spacing: -0.02em;
+}
+.drop-overlay-inner .drop-sub {
+  margin-top: 12px;
+  color: var(--ink-dim);
+  font-size: 14px;
+}
+
+/* Tabla de revisión PDF (desktop) */
+.pdf-review-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 13px;
+}
+.pdf-review-table thead th {
+  text-align: left;
+  padding: 12px;
+  background: var(--bg-2);
+  color: var(--ink-mute);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+.pdf-review-table tbody td {
+  padding: 12px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: middle;
+}
+.pdf-review-table tbody tr:hover { background: var(--surface-2); }
+.pdf-review-table input,
+.pdf-review-table select {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--ink);
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 13px;
+  width: 100%;
+}
+.pdf-review-table input:hover,
+.pdf-review-table select:hover {
+  border-color: var(--line-2);
+  background: var(--bg-2);
+}
+.pdf-review-table input:focus,
+.pdf-review-table select:focus {
+  border-color: var(--accent);
+  background: var(--bg-2);
+  outline: none;
+}
+
+/* En móvil la tabla se convierte en lista de cards */
+@media (max-width: 720px) {
+  .pdf-review-table thead { display: none; }
+  .pdf-review-table tr {
+    display: block;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 14px;
+    margin-bottom: 10px;
+  }
+  .pdf-review-table td {
+    display: flex;
+    justify-content: space-between;
+    border: none;
+    padding: 6px 0;
+  }
+  .pdf-review-table td::before {
+    content: attr(data-label);
+    color: var(--ink-mute);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-right: 12px;
+  }
+}
+
+/* HERO en desktop: tres columnas para más densidad */
+@media (min-width: 1200px) {
+  .hero {
+    grid-template-columns: 1.6fr 1fr 1fr;
+    gap: 16px;
+  }
+  .mini-cards {
+    grid-template-rows: 1fr;
+    grid-template-columns: 1fr;
+  }
+  .hero > .mini-cards { display: contents; }
+  .hero > .mini-cards > .mini-card { display: flex; }
+}
+
 @media (max-width: 720px) {
   .card { padding: 20px 18px; border-radius: 20px; }
   .balance-card { padding: 24px 22px; border-radius: 22px; }
@@ -318,6 +528,51 @@ body::before {
 </style>
 </head>
 <body>
+
+<!-- Sidebar (visible solo en desktop ≥1000px) -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">Caudal<em>.</em></div>
+  <button class="sidebar-item active" data-view="home">
+    <span class="sidebar-icon">🏠</span>
+    <span>Inicio</span>
+  </button>
+  <button class="sidebar-item" data-view="accounts">
+    <span class="sidebar-icon">💳</span>
+    <span>Cuentas</span>
+  </button>
+  <button class="sidebar-item" data-view="add">
+    <span class="sidebar-icon">➕</span>
+    <span>Agregar</span>
+  </button>
+  <button class="sidebar-item" data-view="goals">
+    <span class="sidebar-icon">🎯</span>
+    <span>Metas</span>
+  </button>
+  <button class="sidebar-item" data-view="more">
+    <span class="sidebar-icon">⚙️</span>
+    <span>Más</span>
+  </button>
+  <div class="sidebar-spacer">
+    <button class="sidebar-item" id="sidebar-import">
+      <span class="sidebar-icon">📄</span>
+      <span>Importar PDF</span>
+    </button>
+    <button class="sidebar-item" id="sidebar-export">
+      <span class="sidebar-icon">⬇️</span>
+      <span>Exportar</span>
+    </button>
+  </div>
+</aside>
+
+<!-- Drop overlay (drag & drop PDFs) -->
+<div class="drop-overlay" id="drop-overlay">
+  <div class="drop-overlay-inner">
+    <span class="drop-icon">📄</span>
+    <div class="drop-text">Suelta tu PDF aquí</div>
+    <div class="drop-sub">Lo procesaremos automáticamente</div>
+  </div>
+</div>
+
 <div class="app">
 
   <header class="header">
@@ -1101,8 +1356,10 @@ body::before {
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
     document.getElementById(`view-${view}`).classList.add('active');
 
-    document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
-    document.querySelector(`[data-view="${view}"]`).classList.add('active');
+    // Sincronizar todos los elementos con data-view (sidebar + bottom nav)
+    document.querySelectorAll('[data-view]').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.view === view);
+    });
 
     if (view === 'accounts') renderWallets();
     else if (view === 'goals') renderGoals();
@@ -1285,6 +1542,54 @@ body::before {
     }];
     saveData();
   }
+
+  // Botones de acciones rápidas del sidebar
+  const sidebarImport = document.getElementById('sidebar-import');
+  if (sidebarImport) {
+    sidebarImport.addEventListener('click', () => {
+      document.getElementById('btn-import-pdf')?.click();
+    });
+  }
+
+  const sidebarExport = document.getElementById('sidebar-export');
+  if (sidebarExport) {
+    sidebarExport.addEventListener('click', () => {
+      exportJSON();
+    });
+  }
+
+  // Drag & drop de PDFs (solo desktop)
+  let dragCounter = 0;
+  window.addEventListener('dragenter', (e) => {
+    e.preventDefault();
+    if (e.dataTransfer.types.includes('Files')) {
+      dragCounter++;
+      document.getElementById('drop-overlay').classList.add('show');
+    }
+  });
+
+  window.addEventListener('dragover', (e) => {
+    e.preventDefault();
+  });
+
+  window.addEventListener('dragleave', (e) => {
+    e.preventDefault();
+    dragCounter--;
+    if (dragCounter <= 0) {
+      dragCounter = 0;
+      document.getElementById('drop-overlay').classList.remove('show');
+    }
+  });
+
+  window.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dragCounter = 0;
+    document.getElementById('drop-overlay').classList.remove('show');
+    const files = Array.from(e.dataTransfer.files).filter(f => f.type === 'application/pdf');
+    if (files.length > 0) {
+      alert('PDF drag & drop: procesamiento en desarrollo');
+    }
+  });
 
   updateGreeting();
   renderCategoryGrid();
