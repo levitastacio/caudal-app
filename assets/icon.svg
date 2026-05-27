@@ -1,0 +1,19 @@
+<svg viewBox="0 0 192 192" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="192" height="192" fill="#0a0d0c" rx="32"/>
+
+  <!-- Letter C with gradient -->
+  <defs>
+    <linearGradient id="cGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#d4ff3a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#a8cc2e;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Large C -->
+  <path d="M 48 48 L 120 48 L 120 72 L 80 72 L 80 108 L 120 108 L 120 132 L 48 132 Q 48 90 48 48 Z"
+        fill="none" stroke="url(#cGradient)" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Money symbol inside -->
+  <circle cx="96" cy="90" r="3" fill="url(#cGradient)" opacity="0.5"/>
+</svg>
